@@ -3,8 +3,16 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="color_fondo">#1B1B2F</color>
+    <color name="color_superficie">#252545</color>
+    <color name="color_borde">#2E2E50</color>
     <color name="color_acento">#E2B96F</color>
+    <color name="color_acento_oscuro">#C49A50</color>
     <color name="color_texto_primario">#FFFFFF</color>
     <color name="color_texto_secundario">#B0B0C8</color>
-    <color name="color_superficie">#252545</color>
+
+    <!-- Rarezas -->
+    <color name="color_rareza_common">#9E9E9E</color>
+    <color name="color_rareza_super_rare">#42A5F5</color>
+    <color name="color_rareza_ultra_rare">#E2B96F</color>
+    <color name="color_rareza_secret_rare">#CE93D8</color>
 </resources>

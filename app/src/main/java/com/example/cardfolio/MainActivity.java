@@ -1,7 +1,9 @@
 package com.example.cardfolio;
 
+import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Gravity;
 import android.widget.Button;
 import android.widget.EditText;
@@ -42,13 +44,13 @@ public class MainActivity extends AppCompatActivity {
         Button btnBuscar = findViewById(R.id.btnBuscar);
 
         inicializarCatalogo();
+        mostrarBienvenida();
 
         btnBuscar.setOnClickListener(v -> {
             String query = etBuscar.getText().toString().trim();
             buscarCartas(query);
         });
 
-        // Navegación inferior
         findViewById(R.id.navPortfolio).setOnClickListener(v ->
                 Toast.makeText(this, "Portfolio — próximamente", Toast.LENGTH_SHORT).show()
         );
@@ -65,14 +67,32 @@ public class MainActivity extends AppCompatActivity {
         catalogo.add(new Carta("Dinomorphia Therizia", "Super Rare", R.drawable.dinomorphia_therizia_sr, 0.46));
         catalogo.add(new Carta("Dinomorphia Sonic", "Common", R.drawable.dinomorphia_sonic_c, 0.12));
         catalogo.add(new Carta("Dinomorphia Reversion", "Common", R.drawable.dinomorphia_reversion_c, 0.13));
+        catalogo.add(new Carta("Shaddoll Construct", "Ultra Rare", R.drawable.shaddoll_construct_ur, 2.40));
+    }
 
+    private void mostrarBienvenida() {
+        contenedorResultados.removeAllViews();
+
+        TextView tv = new TextView(this);
+        tv.setText(getString(R.string.bienvenida_texto));
+        tv.setTextColor(getColor(R.color.color_texto_secundario));
+        tv.setTextSize(15);
+        tv.setGravity(Gravity.CENTER);
+        tv.setPadding(0, dpToPx(40), 0, 0);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        tv.setLayoutParams(params);
+        contenedorResultados.addView(tv);
     }
 
     private void buscarCartas(String query) {
         contenedorResultados.removeAllViews();
 
         if (query.isEmpty()) {
-            mostrarMensaje("Escribí el nombre de una carta para buscar.");
+            mostrarBienvenida();
             return;
         }
 
@@ -85,22 +105,28 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (!hayResultados) {
-            mostrarMensaje("No se encontraron cartas con ese nombre.");
+            TextView tv = new TextView(this);
+            tv.setText(getString(R.string.sin_resultados));
+            tv.setTextColor(getColor(R.color.color_texto_secundario));
+            tv.setTextSize(14);
+            tv.setGravity(Gravity.CENTER);
+            tv.setPadding(0, dpToPx(40), 0, 0);
+            contenedorResultados.addView(tv);
         }
     }
 
     private LinearLayout crearVistaCarta(Carta carta) {
-        // Contenedor principal de la carta (horizontal)
+        // Contenedor con bordes redondeados
         LinearLayout contenedor = new LinearLayout(this);
         contenedor.setOrientation(LinearLayout.HORIZONTAL);
-        contenedor.setBackgroundColor(getColor(R.color.color_superficie));
+        contenedor.setBackground(getDrawable(R.drawable.fondo_carta));
         contenedor.setPadding(dpToPx(12), dpToPx(12), dpToPx(12), dpToPx(12));
 
         LinearLayout.LayoutParams paramsContenedor = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        paramsContenedor.setMargins(0, 0, 0, dpToPx(8));
+        paramsContenedor.setMargins(0, 0, 0, dpToPx(10));
         contenedor.setLayoutParams(paramsContenedor);
 
         // Imagen de la carta
@@ -111,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         imagen.setScaleType(ImageView.ScaleType.CENTER_CROP);
         contenedor.addView(imagen);
 
-        // Info: nombre y rareza (vertical)
+        // Info: nombre, rareza y valor
         LinearLayout info = new LinearLayout(this);
         info.setOrientation(LinearLayout.VERTICAL);
         info.setGravity(Gravity.CENTER_VERTICAL);
@@ -127,10 +153,12 @@ public class MainActivity extends AppCompatActivity {
         tvNombre.setTextSize(14);
         tvNombre.setTypeface(null, Typeface.BOLD);
 
+        // Rareza con color dinámico según tipo
         TextView tvRareza = new TextView(this);
         tvRareza.setText(carta.getRareza());
-        tvRareza.setTextColor(getColor(R.color.color_acento));
+        tvRareza.setTextColor(getColorPorRareza(carta.getRareza()));
         tvRareza.setTextSize(12);
+        tvRareza.setTypeface(null, Typeface.ITALIC);
 
         TextView tvValor = new TextView(this);
         tvValor.setText("$ " + carta.getValor());
@@ -142,34 +170,39 @@ public class MainActivity extends AppCompatActivity {
         info.addView(tvValor);
         contenedor.addView(info);
 
-        // Botón agregar
+        // Botón agregar con feedback visual al presionar
         Button btnAgregar = new Button(this);
         btnAgregar.setText(getString(R.string.btn_agregar_carta));
         btnAgregar.setTextColor(getColor(R.color.color_fondo));
-        btnAgregar.setBackgroundTintList(
-                android.content.res.ColorStateList.valueOf(getColor(R.color.color_acento))
-        );
+        btnAgregar.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.color_acento)));
+
         LinearLayout.LayoutParams paramBtn = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
         paramBtn.gravity = Gravity.CENTER_VERTICAL;
         btnAgregar.setLayoutParams(paramBtn);
-        btnAgregar.setOnClickListener(v ->
-                Toast.makeText(this, "\"" + carta.getNombre() + "\" agregada a tu colección", Toast.LENGTH_SHORT).show()
-        );
+
+        btnAgregar.setOnClickListener(v -> {
+            btnAgregar.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.color_acento_oscuro)));
+            new Handler().postDelayed(() ->
+                    btnAgregar.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.color_acento))),
+                    250
+            );
+            Toast.makeText(this, "\"" + carta.getNombre() + "\" " + getString(R.string.carta_agregada), Toast.LENGTH_SHORT).show();
+        });
 
         contenedor.addView(btnAgregar);
         return contenedor;
     }
 
-    private void mostrarMensaje(String mensaje) {
-        TextView tv = new TextView(this);
-        tv.setText(mensaje);
-        tv.setTextColor(getColor(R.color.color_texto_secundario));
-        tv.setTextSize(14);
-        tv.setPadding(0, dpToPx(8), 0, 0);
-        contenedorResultados.addView(tv);
+    private int getColorPorRareza(String rareza) {
+        switch (rareza) {
+            case "Super Rare":  return getColor(R.color.color_rareza_super_rare);
+            case "Ultra Rare":  return getColor(R.color.color_rareza_ultra_rare);
+            case "Secret Rare": return getColor(R.color.color_rareza_secret_rare);
+            default:            return getColor(R.color.color_rareza_common);
+        }
     }
 
     private int dpToPx(int dp) {
