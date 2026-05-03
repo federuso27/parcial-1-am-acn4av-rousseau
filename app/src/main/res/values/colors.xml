@@ -6,4 +6,5 @@
     <color name="color_acento">#E2B96F</color>
     <color name="color_texto_primario">#FFFFFF</color>
     <color name="color_texto_secundario">#B0B0C8</color>
+    <color name="color_superficie">#252545</color>
 </resources>

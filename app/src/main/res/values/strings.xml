@@ -8,4 +8,8 @@
     <string name="hint_valor">Valor estimado ($)</string>
     <string name="titulo_coleccion">Mi colección</string>
     <string name="label_valor_total">Valor total: $</string>
+    <string name="hint_buscar">Buscar carta por nombre…</string>
+    <string name="btn_buscar">Buscar</string>
+    <string name="label_resultados">Resultados</string>
+    <string name="btn_agregar_carta">Agregar</string>
 </resources>

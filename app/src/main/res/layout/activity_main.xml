@@ -32,4 +32,72 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvTitulo" />
 
+    <!-- Buscador: LinearLayout horizontal con EditText + Button -->
+    <LinearLayout
+        android:id="@+id/layoutBuscador"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/margen_grande"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvSubtitulo">
+
+        <EditText
+            android:id="@+id/etBuscar"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/alto_boton"
+            android:layout_weight="1"
+            android:hint="@string/hint_buscar"
+            android:textColor="@color/color_texto_primario"
+            android:textColorHint="@color/color_texto_secundario"
+            android:background="@drawable/fondo_input"
+            android:paddingStart="@dimen/margen_medio"
+            android:paddingEnd="@dimen/margen_medio"
+            android:inputType="text"
+            android:maxLines="1"
+            android:imeOptions="actionSearch" />
+
+        <Button
+            android:id="@+id/btnBuscar"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/alto_boton"
+            android:layout_marginStart="@dimen/margen_pequeño"
+            android:text="@string/btn_buscar"
+            android:textColor="@color/color_fondo"
+            android:backgroundTint="@color/color_acento" />
+
+    </LinearLayout>
+
+    <!-- Etiqueta de resultados -->
+    <TextView
+        android:id="@+id/tvResultados"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/label_resultados"
+        android:textColor="@color/color_texto_secundario"
+        android:textSize="@dimen/texto_cuerpo"
+        android:layout_marginTop="@dimen/margen_medio"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutBuscador" />
+
+    <!-- ScrollView donde se agregan las cartas dinámicamente desde Java -->
+    <ScrollView
+        android:id="@+id/scrollResultados"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/margen_pequeño"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvResultados"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:id="@+id/contenedorResultados"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+    </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
