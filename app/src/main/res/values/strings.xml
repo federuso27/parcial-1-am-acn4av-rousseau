@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Cardfolio</string>
+    <string name="titulo_app">Cardfolio</string>
+    <string name="subtitulo_app">Tu colección personal de cartas</string>
+    <string name="btn_agregar">Agregar carta</string>
+    <string name="hint_nombre_carta">Nombre de la carta</string>
+    <string name="hint_cantidad">Cantidad</string>
+    <string name="hint_valor">Valor estimado ($)</string>
+    <string name="titulo_coleccion">Mi colección</string>
+    <string name="label_valor_total">Valor total: $</string>
 </resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="margen_pequeño">8dp</dimen>
+    <dimen name="margen_medio">16dp</dimen>
+    <dimen name="margen_grande">24dp</dimen>
+    <dimen name="texto_titulo">26sp</dimen>
+    <dimen name="texto_cuerpo">14sp</dimen>
+    <dimen name="alto_boton">48dp</dimen>
+</resources>
