@@ -5,6 +5,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -25,7 +26,14 @@ public class MainActivity extends AppCompatActivity {
 
     private EditText etBuscar;
     private LinearLayout contenedorResultados;
+    private LinearLayout contenedorJuegos;
+    private LinearLayout itemJuegoSeleccionado = null;
+    private Button btnQuitarFiltro = null;
+    private String juegoSeleccionado = null;
+
     private List<Carta> catalogo = new ArrayList<>();
+    private List<Juego> juegos = new ArrayList<>();
+    private List<LinearLayout> itemsJuego = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,9 +49,11 @@ public class MainActivity extends AppCompatActivity {
 
         etBuscar = findViewById(R.id.etBuscar);
         contenedorResultados = findViewById(R.id.contenedorResultados);
+        contenedorJuegos = findViewById(R.id.contenedorJuegos);
         Button btnBuscar = findViewById(R.id.btnBuscar);
 
         inicializarCatalogo();
+        inicializarJuegos();
         mostrarBienvenida();
 
         btnBuscar.setOnClickListener(v -> {
@@ -60,14 +70,141 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void inicializarCatalogo() {
-        catalogo.add(new Carta("Dinomorphia Kentregina", "Super Rare", R.drawable.dinomorphia_kentregina_sr, 15.00));
-        catalogo.add(new Carta("Dinomorphia Frenzy", "Super Rare", R.drawable.dinomorphia_frenzy_sr, 8.00));
-        catalogo.add(new Carta("Dinomorphia Diplos", "Common", R.drawable.dinomorphia_diplos_c, 1.50));
-        catalogo.add(new Carta("Dinomorphia Domain", "Ultra Rare", R.drawable.dinomorphia_domain_ur, 0.23));
-        catalogo.add(new Carta("Dinomorphia Therizia", "Super Rare", R.drawable.dinomorphia_therizia_sr, 0.46));
-        catalogo.add(new Carta("Dinomorphia Sonic", "Common", R.drawable.dinomorphia_sonic_c, 0.12));
-        catalogo.add(new Carta("Dinomorphia Reversion", "Common", R.drawable.dinomorphia_reversion_c, 0.13));
-        catalogo.add(new Carta("Shaddoll Construct", "Ultra Rare", R.drawable.shaddoll_construct_ur, 2.40));
+        catalogo.add(new Carta("Dinomorphia Kentregina", "Super Rare", R.drawable.dinomorphia_kentregina_sr, 15.00, "Yu-Gi-Oh!"));
+        catalogo.add(new Carta("Dinomorphia Frenzy", "Super Rare", R.drawable.dinomorphia_frenzy_sr, 8.00, "Yu-Gi-Oh!"));
+        catalogo.add(new Carta("Dinomorphia Diplos", "Common", R.drawable.dinomorphia_diplos_c, 1.50, "Yu-Gi-Oh!"));
+        catalogo.add(new Carta("Dinomorphia Domain", "Ultra Rare", R.drawable.dinomorphia_domain_ur, 0.23, "Yu-Gi-Oh!"));
+        catalogo.add(new Carta("Dinomorphia Therizia", "Super Rare", R.drawable.dinomorphia_therizia_sr, 0.46, "Yu-Gi-Oh!"));
+        catalogo.add(new Carta("Dinomorphia Sonic", "Common", R.drawable.dinomorphia_sonic_c, 0.12, "Yu-Gi-Oh!"));
+        catalogo.add(new Carta("Dinomorphia Reversion", "Common", R.drawable.dinomorphia_reversion_c, 0.13, "Yu-Gi-Oh!"));
+        catalogo.add(new Carta("Shaddoll Construct", "Ultra Rare", R.drawable.shaddoll_construct_ur, 2.40, "Yu-Gi-Oh!"));
+    }
+
+    private void inicializarJuegos() {
+        juegos.add(new Juego("Yu-Gi-Oh!", R.drawable.logo_yugioh));
+        juegos.add(new Juego("Pokémon", R.drawable.logo_pokemon));
+        juegos.add(new Juego("Magic", R.drawable.logo_magic));
+        juegos.add(new Juego("One Piece", R.drawable.logo_onepiece));
+        juegos.add(new Juego("Riftbound", R.drawable.logo_riftbound));
+
+        for (Juego juego : juegos) {
+            LinearLayout item = crearItemJuego(juego);
+            itemsJuego.add(item);
+            contenedorJuegos.addView(item);
+        }
+    }
+
+    private LinearLayout crearItemJuego(Juego juego) {
+        LinearLayout item = new LinearLayout(this);
+        item.setOrientation(LinearLayout.HORIZONTAL);
+        item.setGravity(Gravity.CENTER_VERTICAL);
+        item.setBackground(getDrawable(R.drawable.fondo_carta));
+        item.setPadding(dpToPx(16), dpToPx(12), dpToPx(16), dpToPx(12));
+
+        LinearLayout.LayoutParams paramsItem = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        paramsItem.setMargins(0, 0, 0, dpToPx(10));
+        item.setLayoutParams(paramsItem);
+
+        ImageView logo = new ImageView(this);
+        LinearLayout.LayoutParams paramsLogo = new LinearLayout.LayoutParams(dpToPx(120), dpToPx(70));
+        logo.setLayoutParams(paramsLogo);
+        logo.setImageResource(juego.getLogoResId());
+        logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
+
+        TextView tvNombre = new TextView(this);
+        tvNombre.setText(juego.getNombre());
+        tvNombre.setTextColor(getColor(R.color.color_texto_primario));
+        tvNombre.setTextSize(16);
+        tvNombre.setTypeface(null, Typeface.BOLD);
+        LinearLayout.LayoutParams paramsNombre = new LinearLayout.LayoutParams(
+                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
+        );
+        paramsNombre.setMarginStart(dpToPx(16));
+        tvNombre.setLayoutParams(paramsNombre);
+
+        item.addView(logo);
+        item.addView(tvNombre);
+        item.setOnClickListener(v -> seleccionarJuego(juego, item));
+
+        return item;
+    }
+
+    private void seleccionarJuego(Juego juego, LinearLayout item) {
+        // Ocultar todos los items menos el seleccionado
+        for (LinearLayout itemJuego : itemsJuego) {
+            if (itemJuego != item) {
+                itemJuego.setVisibility(View.GONE);
+            }
+        }
+
+        // Resaltar el seleccionado
+        item.setBackground(getDrawable(R.drawable.fondo_juego_seleccionado));
+        itemJuegoSeleccionado = item;
+        juegoSeleccionado = juego.getNombre();
+
+        // Agregar botón "Quitar filtro" debajo del juego seleccionado
+        if (btnQuitarFiltro == null) {
+            btnQuitarFiltro = new Button(this);
+            btnQuitarFiltro.setText(getString(R.string.btn_quitar_filtro));
+            btnQuitarFiltro.setTextColor(getColor(R.color.color_acento));
+            btnQuitarFiltro.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            btnQuitarFiltro.setLayoutParams(params);
+            btnQuitarFiltro.setOnClickListener(v -> limpiarFiltro());
+            contenedorJuegos.addView(btnQuitarFiltro);
+        }
+
+        etBuscar.setText("");
+        mostrarCartasPorJuego(juego.getNombre());
+    }
+
+    private void limpiarFiltro() {
+        // Mostrar todos los items de juego
+        for (LinearLayout itemJuego : itemsJuego) {
+            itemJuego.setVisibility(View.VISIBLE);
+            itemJuego.setBackground(getDrawable(R.drawable.fondo_carta));
+        }
+
+        // Eliminar botón quitar filtro
+        if (btnQuitarFiltro != null) {
+            contenedorJuegos.removeView(btnQuitarFiltro);
+            btnQuitarFiltro = null;
+        }
+
+        itemJuegoSeleccionado = null;
+        juegoSeleccionado = null;
+        etBuscar.setText("");
+        mostrarBienvenida();
+    }
+
+    private void mostrarCartasPorJuego(String nombreJuego) {
+        contenedorResultados.removeAllViews();
+
+        if (!nombreJuego.equals("Yu-Gi-Oh!")) {
+            TextView tv = new TextView(this);
+            tv.setText(getString(R.string.juego_proximamente));
+            tv.setTextColor(getColor(R.color.color_texto_secundario));
+            tv.setTextSize(15);
+            tv.setGravity(Gravity.CENTER);
+            tv.setPadding(0, dpToPx(24), 0, 0);
+            tv.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+            ));
+            contenedorResultados.addView(tv);
+            return;
+        }
+
+        for (Carta carta : catalogo) {
+            if (carta.getJuego().equals(nombreJuego)) {
+                contenedorResultados.addView(crearVistaCarta(carta));
+            }
+        }
     }
 
     private void mostrarBienvenida() {
@@ -78,13 +215,10 @@ public class MainActivity extends AppCompatActivity {
         tv.setTextColor(getColor(R.color.color_texto_secundario));
         tv.setTextSize(15);
         tv.setGravity(Gravity.CENTER);
-        tv.setPadding(0, dpToPx(40), 0, 0);
-
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        tv.setLayoutParams(params);
+        tv.setPadding(0, dpToPx(24), 0, 0);
+        tv.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
         contenedorResultados.addView(tv);
     }
 
@@ -92,13 +226,20 @@ public class MainActivity extends AppCompatActivity {
         contenedorResultados.removeAllViews();
 
         if (query.isEmpty()) {
-            mostrarBienvenida();
+            if (juegoSeleccionado != null) {
+                mostrarCartasPorJuego(juegoSeleccionado);
+            } else {
+                mostrarBienvenida();
+            }
             return;
         }
 
         boolean hayResultados = false;
         for (Carta carta : catalogo) {
-            if (carta.getNombre().toLowerCase().contains(query.toLowerCase())) {
+            boolean coincideNombre = carta.getNombre().toLowerCase().contains(query.toLowerCase());
+            boolean coincideJuego = juegoSeleccionado == null || carta.getJuego().equals(juegoSeleccionado);
+
+            if (coincideNombre && coincideJuego) {
                 contenedorResultados.addView(crearVistaCarta(carta));
                 hayResultados = true;
             }
@@ -110,40 +251,33 @@ public class MainActivity extends AppCompatActivity {
             tv.setTextColor(getColor(R.color.color_texto_secundario));
             tv.setTextSize(14);
             tv.setGravity(Gravity.CENTER);
-            tv.setPadding(0, dpToPx(40), 0, 0);
+            tv.setPadding(0, dpToPx(24), 0, 0);
             contenedorResultados.addView(tv);
         }
     }
 
     private LinearLayout crearVistaCarta(Carta carta) {
-        // Contenedor con bordes redondeados
         LinearLayout contenedor = new LinearLayout(this);
         contenedor.setOrientation(LinearLayout.HORIZONTAL);
         contenedor.setBackground(getDrawable(R.drawable.fondo_carta));
         contenedor.setPadding(dpToPx(12), dpToPx(12), dpToPx(12), dpToPx(12));
 
         LinearLayout.LayoutParams paramsContenedor = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
         );
         paramsContenedor.setMargins(0, 0, 0, dpToPx(10));
         contenedor.setLayoutParams(paramsContenedor);
 
-        // Imagen de la carta
         ImageView imagen = new ImageView(this);
-        LinearLayout.LayoutParams paramsImagen = new LinearLayout.LayoutParams(dpToPx(60), dpToPx(84));
-        imagen.setLayoutParams(paramsImagen);
+        imagen.setLayoutParams(new LinearLayout.LayoutParams(dpToPx(60), dpToPx(84)));
         imagen.setImageResource(carta.getImagenResId());
         imagen.setScaleType(ImageView.ScaleType.CENTER_CROP);
         contenedor.addView(imagen);
 
-        // Info: nombre, rareza y valor
         LinearLayout info = new LinearLayout(this);
         info.setOrientation(LinearLayout.VERTICAL);
         info.setGravity(Gravity.CENTER_VERTICAL);
-        LinearLayout.LayoutParams paramsInfo = new LinearLayout.LayoutParams(
-                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
-        );
+        LinearLayout.LayoutParams paramsInfo = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
         paramsInfo.setMarginStart(dpToPx(12));
         info.setLayoutParams(paramsInfo);
 
@@ -153,7 +287,6 @@ public class MainActivity extends AppCompatActivity {
         tvNombre.setTextSize(14);
         tvNombre.setTypeface(null, Typeface.BOLD);
 
-        // Rareza con color dinámico según tipo
         TextView tvRareza = new TextView(this);
         tvRareza.setText(carta.getRareza());
         tvRareza.setTextColor(getColorPorRareza(carta.getRareza()));
@@ -170,15 +303,12 @@ public class MainActivity extends AppCompatActivity {
         info.addView(tvValor);
         contenedor.addView(info);
 
-        // Botón agregar con feedback visual al presionar
         Button btnAgregar = new Button(this);
         btnAgregar.setText(getString(R.string.btn_agregar_carta));
         btnAgregar.setTextColor(getColor(R.color.color_fondo));
         btnAgregar.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.color_acento)));
-
         LinearLayout.LayoutParams paramBtn = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
         );
         paramBtn.gravity = Gravity.CENTER_VERTICAL;
         btnAgregar.setLayoutParams(paramBtn);
@@ -186,8 +316,7 @@ public class MainActivity extends AppCompatActivity {
         btnAgregar.setOnClickListener(v -> {
             btnAgregar.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.color_acento_oscuro)));
             new Handler().postDelayed(() ->
-                    btnAgregar.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.color_acento))),
-                    250
+                    btnAgregar.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.color_acento))), 250
             );
             Toast.makeText(this, "\"" + carta.getNombre() + "\" " + getString(R.string.carta_agregada), Toast.LENGTH_SHORT).show();
         });

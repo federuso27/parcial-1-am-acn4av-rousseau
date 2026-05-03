@@ -18,4 +18,7 @@
     <string name="bienvenida_texto">Buscá una carta para comenzar</string>
     <string name="sin_resultados">No se encontraron cartas con ese nombre.</string>
     <string name="carta_agregada">agregada a tu colección</string>
+    <string name="juego_proximamente">Próximamente…</string>
+    <string name="btn_quitar_filtro">✕ Quitar filtro</string>
+    <string name="label_juegos">Filtro rápido</string>
 </resources>
