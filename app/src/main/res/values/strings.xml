@@ -12,4 +12,7 @@
     <string name="btn_buscar">Buscar</string>
     <string name="label_resultados">Resultados</string>
     <string name="btn_agregar_carta">Agregar</string>
+    <string name="nav_buscar">Buscar</string>
+    <string name="nav_portfolio">Portfolio</string>
+    <string name="nav_perfil">Perfil</string>
 </resources>

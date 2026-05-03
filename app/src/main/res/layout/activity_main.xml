@@ -5,8 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/color_fondo"
-    android:padding="@dimen/margen_medio">
+    android:background="@color/color_fondo">
 
     <!-- Título principal -->
     <TextView
@@ -17,6 +16,8 @@
         android:textColor="@color/color_acento"
         android:textSize="@dimen/texto_titulo"
         android:textStyle="bold"
+        android:layout_marginStart="@dimen/margen_medio"
+        android:layout_marginTop="@dimen/margen_medio"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -28,6 +29,7 @@
         android:text="@string/subtitulo_app"
         android:textColor="@color/color_texto_secundario"
         android:textSize="@dimen/texto_cuerpo"
+        android:layout_marginStart="@dimen/margen_medio"
         android:layout_marginTop="4dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvTitulo" />
@@ -38,6 +40,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginStart="@dimen/margen_medio"
+        android:layout_marginEnd="@dimen/margen_medio"
         android:layout_marginTop="@dimen/margen_grande"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -69,7 +73,7 @@
 
     </LinearLayout>
 
-    <!-- Etiqueta de resultados -->
+    <!-- Etiqueta resultados -->
     <TextView
         android:id="@+id/tvResultados"
         android:layout_width="wrap_content"
@@ -77,20 +81,23 @@
         android:text="@string/label_resultados"
         android:textColor="@color/color_texto_secundario"
         android:textSize="@dimen/texto_cuerpo"
+        android:layout_marginStart="@dimen/margen_medio"
         android:layout_marginTop="@dimen/margen_medio"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layoutBuscador" />
 
-    <!-- ScrollView donde se agregan las cartas dinámicamente desde Java -->
+    <!-- ScrollView con resultados dinámicos -->
     <ScrollView
         android:id="@+id/scrollResultados"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginStart="@dimen/margen_medio"
+        android:layout_marginEnd="@dimen/margen_medio"
         android:layout_marginTop="@dimen/margen_pequeño"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvResultados"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toTopOf="@id/navBar">
 
         <LinearLayout
             android:id="@+id/contenedorResultados"
@@ -99,5 +106,96 @@
             android:orientation="vertical" />
 
     </ScrollView>
+
+    <!-- Barra de navegación inferior -->
+    <LinearLayout
+        android:id="@+id/navBar"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:orientation="horizontal"
+        android:background="@drawable/fondo_nav_bar"
+        android:layout_marginStart="@dimen/margen_medio"
+        android:layout_marginEnd="@dimen/margen_medio"
+        android:layout_marginBottom="@dimen/margen_medio"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- Opción Buscar (activa) -->
+        <LinearLayout
+            android:id="@+id/navBuscar"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_buscar"
+                android:tint="@color/color_acento" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/nav_buscar"
+                android:textColor="@color/color_acento"
+                android:textSize="11sp"
+                android:layout_marginTop="2dp" />
+
+        </LinearLayout>
+
+        <!-- Opción Portfolio -->
+        <LinearLayout
+            android:id="@+id/navPortfolio"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_portfolio"
+                android:tint="@color/color_texto_secundario" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/nav_portfolio"
+                android:textColor="@color/color_texto_secundario"
+                android:textSize="11sp"
+                android:layout_marginTop="2dp" />
+
+        </LinearLayout>
+
+        <!-- Opción Perfil -->
+        <LinearLayout
+            android:id="@+id/navPerfil"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_perfil"
+                android:tint="@color/color_texto_secundario" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/nav_perfil"
+                android:textColor="@color/color_texto_secundario"
+                android:textSize="11sp"
+                android:layout_marginTop="2dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

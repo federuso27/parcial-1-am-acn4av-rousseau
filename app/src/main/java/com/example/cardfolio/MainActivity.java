@@ -47,12 +47,25 @@ public class MainActivity extends AppCompatActivity {
             String query = etBuscar.getText().toString().trim();
             buscarCartas(query);
         });
+
+        // Navegación inferior
+        findViewById(R.id.navPortfolio).setOnClickListener(v ->
+                Toast.makeText(this, "Portfolio — próximamente", Toast.LENGTH_SHORT).show()
+        );
+        findViewById(R.id.navPerfil).setOnClickListener(v ->
+                Toast.makeText(this, "Perfil — próximamente", Toast.LENGTH_SHORT).show()
+        );
     }
 
     private void inicializarCatalogo() {
         catalogo.add(new Carta("Dinomorphia Kentregina", "Super Rare", R.drawable.dinomorphia_kentregina_sr, 15.00));
         catalogo.add(new Carta("Dinomorphia Frenzy", "Super Rare", R.drawable.dinomorphia_frenzy_sr, 8.00));
         catalogo.add(new Carta("Dinomorphia Diplos", "Common", R.drawable.dinomorphia_diplos_c, 1.50));
+        catalogo.add(new Carta("Dinomorphia Domain", "Ultra Rare", R.drawable.dinomorphia_domain_ur, 0.23));
+        catalogo.add(new Carta("Dinomorphia Therizia", "Super Rare", R.drawable.dinomorphia_therizia_sr, 0.46));
+        catalogo.add(new Carta("Dinomorphia Sonic", "Common", R.drawable.dinomorphia_sonic_c, 0.12));
+        catalogo.add(new Carta("Dinomorphia Reversion", "Common", R.drawable.dinomorphia_reversion_c, 0.13));
+
     }
 
     private void buscarCartas(String query) {
