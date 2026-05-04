@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.ScaleAnimation;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -78,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
         catalogo.add(new Carta("Dinomorphia Sonic", "Common", R.drawable.dinomorphia_sonic_c, 0.12, "Yu-Gi-Oh!"));
         catalogo.add(new Carta("Dinomorphia Reversion", "Common", R.drawable.dinomorphia_reversion_c, 0.13, "Yu-Gi-Oh!"));
         catalogo.add(new Carta("Shaddoll Construct", "Ultra Rare", R.drawable.shaddoll_construct_ur, 2.40, "Yu-Gi-Oh!"));
+        catalogo.add(new Carta("Blue-Eyes White Dragon", "Ultra rare", R.drawable.blueeyes_white_dragon_ur, 0.78, "Yu-Gi-Oh!"));
     }
 
     private void inicializarJuegos() {
@@ -314,15 +318,70 @@ public class MainActivity extends AppCompatActivity {
         btnAgregar.setLayoutParams(paramBtn);
 
         btnAgregar.setOnClickListener(v -> {
-            btnAgregar.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.color_acento_oscuro)));
-            new Handler().postDelayed(() ->
-                    btnAgregar.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.color_acento))), 250
+            // 1. Animación de escala en el botón
+            ScaleAnimation escala = new ScaleAnimation(
+                    1f, 1.15f, 1f, 1.15f,
+                    Animation.RELATIVE_TO_SELF, 0.5f,
+                    Animation.RELATIVE_TO_SELF, 0.5f
             );
-            Toast.makeText(this, "\"" + carta.getNombre() + "\" " + getString(R.string.carta_agregada), Toast.LENGTH_SHORT).show();
+            escala.setDuration(120);
+            escala.setRepeatMode(Animation.REVERSE);
+            escala.setRepeatCount(1);
+            btnAgregar.startAnimation(escala);
+
+            // 2. Cambiar botón a verde
+            btnAgregar.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.color_exito_claro)));
+
+            // 3. Mostrar banner de éxito con fade-in
+            mostrarBannerExito(carta.getNombre());
+
+            // 4. Volver al color dorado después de 1.5 segundos
+            new Handler().postDelayed(() ->
+                    btnAgregar.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.color_acento))),
+                    1500
+            );
         });
 
         contenedor.addView(btnAgregar);
         return contenedor;
+    }
+
+    private void mostrarBannerExito(String nombreCarta) {
+        TextView banner = new TextView(this);
+        banner.setText("✓  \"" + nombreCarta + "\" " + getString(R.string.exito_agregada));
+        banner.setTextColor(getColor(R.color.color_texto_primario));
+        banner.setTextSize(13);
+        banner.setTypeface(null, Typeface.BOLD);
+        banner.setBackground(getDrawable(R.drawable.fondo_exito));
+        banner.setPadding(dpToPx(16), dpToPx(12), dpToPx(16), dpToPx(12));
+        banner.setGravity(Gravity.CENTER);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(0, 0, 0, dpToPx(10));
+        banner.setLayoutParams(params);
+
+        // Fade in
+        AlphaAnimation fadeIn = new AlphaAnimation(0f, 1f);
+        fadeIn.setDuration(300);
+        banner.startAnimation(fadeIn);
+        contenedorResultados.addView(banner, 0);
+
+        // Fade out y eliminar después de 2 segundos
+        new Handler().postDelayed(() -> {
+            AlphaAnimation fadeOut = new AlphaAnimation(1f, 0f);
+            fadeOut.setDuration(400);
+            fadeOut.setAnimationListener(new Animation.AnimationListener() {
+                @Override public void onAnimationStart(Animation a) {}
+                @Override public void onAnimationRepeat(Animation a) {}
+                @Override public void onAnimationEnd(Animation a) {
+                    contenedorResultados.removeView(banner);
+                }
+            });
+            banner.startAnimation(fadeOut);
+        }, 2000);
     }
 
     private int getColorPorRareza(String rareza) {

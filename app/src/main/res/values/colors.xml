@@ -10,6 +10,10 @@
     <color name="color_texto_primario">#FFFFFF</color>
     <color name="color_texto_secundario">#B0B0C8</color>
 
+    <!-- Éxito -->
+    <color name="color_exito">#2E7D32</color>
+    <color name="color_exito_claro">#43A047</color>
+
     <!-- Rarezas -->
     <color name="color_rareza_common">#9E9E9E</color>
     <color name="color_rareza_super_rare">#42A5F5</color>
