@@ -143,6 +143,26 @@
 
     </ScrollView>
 
+    <!-- Banner de éxito flotante (sobre la nav bar) -->
+    <TextView
+        android:id="@+id/bannerExito"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:background="@drawable/fondo_exito"
+        android:textColor="@color/color_texto_primario"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:paddingTop="@dimen/margen_medio"
+        android:paddingBottom="@dimen/margen_medio"
+        android:layout_marginStart="@dimen/margen_medio"
+        android:layout_marginEnd="@dimen/margen_medio"
+        android:layout_marginBottom="@dimen/margen_pequeño"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/navBar" />
+
     <!-- Barra de navegación inferior -->
     <LinearLayout
         android:id="@+id/navBar"

@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -30,11 +31,13 @@ public class MainActivity extends AppCompatActivity {
     private EditText etBuscar;
     private LinearLayout contenedorResultados;
     private LinearLayout contenedorJuegos;
-    private LinearLayout itemJuegoSeleccionado = null;
     private Button btnQuitarFiltro = null;
     private String juegoSeleccionado = null;
+    private TextView bannerExito;
+    private final Handler bannerHandler = new Handler();
+    private Runnable bannerOcultarRunnable;
 
-    private List<Carta> catalogo = new ArrayList<>();
+    private final List<Carta> catalogo = new ArrayList<>();
     private List<Juego> juegos = new ArrayList<>();
     private List<LinearLayout> itemsJuego = new ArrayList<>();
 
@@ -53,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         etBuscar = findViewById(R.id.etBuscar);
         contenedorResultados = findViewById(R.id.contenedorResultados);
         contenedorJuegos = findViewById(R.id.contenedorJuegos);
+        bannerExito = findViewById(R.id.bannerExito);
         Button btnBuscar = findViewById(R.id.btnBuscar);
 
         inicializarCatalogo();
@@ -102,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout item = new LinearLayout(this);
         item.setOrientation(LinearLayout.HORIZONTAL);
         item.setGravity(Gravity.CENTER_VERTICAL);
-        item.setBackground(getDrawable(R.drawable.fondo_carta));
+        item.setBackground(AppCompatResources.getDrawable(this, R.drawable.fondo_carta));
         item.setPadding(dpToPx(16), dpToPx(12), dpToPx(16), dpToPx(12));
 
         LinearLayout.LayoutParams paramsItem = new LinearLayout.LayoutParams(
@@ -145,8 +149,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Resaltar el seleccionado
-        item.setBackground(getDrawable(R.drawable.fondo_juego_seleccionado));
-        itemJuegoSeleccionado = item;
+        item.setBackground(AppCompatResources.getDrawable(this, R.drawable.fondo_juego_seleccionado));
         juegoSeleccionado = juego.getNombre();
 
         // Agregar botón "Quitar filtro" debajo del juego seleccionado
@@ -172,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
         // Mostrar todos los items de juego
         for (LinearLayout itemJuego : itemsJuego) {
             itemJuego.setVisibility(View.VISIBLE);
-            itemJuego.setBackground(getDrawable(R.drawable.fondo_carta));
+            itemJuego.setBackground(AppCompatResources.getDrawable(this, R.drawable.fondo_carta));
         }
 
         // Eliminar botón quitar filtro
@@ -181,7 +184,6 @@ public class MainActivity extends AppCompatActivity {
             btnQuitarFiltro = null;
         }
 
-        itemJuegoSeleccionado = null;
         juegoSeleccionado = null;
         etBuscar.setText("");
         mostrarBienvenida();
@@ -263,7 +265,7 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout crearVistaCarta(Carta carta) {
         LinearLayout contenedor = new LinearLayout(this);
         contenedor.setOrientation(LinearLayout.HORIZONTAL);
-        contenedor.setBackground(getDrawable(R.drawable.fondo_carta));
+        contenedor.setBackground(AppCompatResources.getDrawable(this, R.drawable.fondo_carta));
         contenedor.setPadding(dpToPx(12), dpToPx(12), dpToPx(12), dpToPx(12));
 
         LinearLayout.LayoutParams paramsContenedor = new LinearLayout.LayoutParams(
@@ -347,41 +349,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void mostrarBannerExito(String nombreCarta) {
-        TextView banner = new TextView(this);
-        banner.setText("✓  \"" + nombreCarta + "\" " + getString(R.string.exito_agregada));
-        banner.setTextColor(getColor(R.color.color_texto_primario));
-        banner.setTextSize(13);
-        banner.setTypeface(null, Typeface.BOLD);
-        banner.setBackground(getDrawable(R.drawable.fondo_exito));
-        banner.setPadding(dpToPx(16), dpToPx(12), dpToPx(16), dpToPx(12));
-        banner.setGravity(Gravity.CENTER);
+        // Cancelar ocultamiento pendiente si el banner ya estaba visible
+        if (bannerOcultarRunnable != null) {
+            bannerHandler.removeCallbacks(bannerOcultarRunnable);
+        }
 
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        params.setMargins(0, 0, 0, dpToPx(10));
-        banner.setLayoutParams(params);
+        bannerExito.setText("✓  \"" + nombreCarta + "\" " + getString(R.string.exito_agregada));
+        bannerExito.setVisibility(View.VISIBLE);
+        bannerExito.clearAnimation();
 
-        // Fade in
         AlphaAnimation fadeIn = new AlphaAnimation(0f, 1f);
         fadeIn.setDuration(300);
-        banner.startAnimation(fadeIn);
-        contenedorResultados.addView(banner, 0);
+        bannerExito.startAnimation(fadeIn);
 
-        // Fade out y eliminar después de 2 segundos
-        new Handler().postDelayed(() -> {
+        bannerOcultarRunnable = () -> {
             AlphaAnimation fadeOut = new AlphaAnimation(1f, 0f);
             fadeOut.setDuration(400);
             fadeOut.setAnimationListener(new Animation.AnimationListener() {
                 @Override public void onAnimationStart(Animation a) {}
                 @Override public void onAnimationRepeat(Animation a) {}
                 @Override public void onAnimationEnd(Animation a) {
-                    contenedorResultados.removeView(banner);
+                    bannerExito.setVisibility(View.GONE);
                 }
             });
-            banner.startAnimation(fadeOut);
-        }, 2000);
+            bannerExito.startAnimation(fadeOut);
+        };
+
+        bannerHandler.postDelayed(bannerOcultarRunnable, 2000);
     }
 
     private int getColorPorRareza(String rareza) {
