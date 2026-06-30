@@ -1,6 +1,6 @@
 package com.example.cardfolio;
 
-public class Carta {
+public class Carta implements java.io.Serializable {
     private String nombre;
     private String rareza;
     private int imagenResId;
