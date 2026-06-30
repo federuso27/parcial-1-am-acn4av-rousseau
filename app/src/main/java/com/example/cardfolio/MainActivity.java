@@ -25,8 +25,13 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,6 +43,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView bannerExito;
     private final Handler bannerHandler = new Handler();
     private Runnable bannerOcultarRunnable;
+
+    private FirebaseFirestore db;
+    private String userId;
 
     private final List<Carta> catalogo = new ArrayList<>();
     private final List<Carta> coleccion = new ArrayList<>();
@@ -71,9 +79,13 @@ public class MainActivity extends AppCompatActivity {
         bannerExito = findViewById(R.id.bannerExito);
         Button btnBuscar = findViewById(R.id.btnBuscar);
 
+        db = FirebaseFirestore.getInstance();
+        userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
         inicializarCatalogo();
         inicializarJuegos();
         mostrarBienvenida();
+        cargarColeccionDesdeFirestore();
 
         btnBuscar.setOnClickListener(v -> {
             String query = etBuscar.getText().toString().trim();
@@ -337,6 +349,7 @@ public class MainActivity extends AppCompatActivity {
 
         btnAgregar.setOnClickListener(v -> {
             coleccion.add(carta);
+            guardarCartaEnFirestore(carta);
 
             // 1. Animación de escala en el botón
             ScaleAnimation escala = new ScaleAnimation(
@@ -403,6 +416,38 @@ public class MainActivity extends AppCompatActivity {
             case "Secret Rare": return getColor(R.color.color_rareza_secret_rare);
             default:            return getColor(R.color.color_rareza_common);
         }
+    }
+
+    private void cargarColeccionDesdeFirestore() {
+        db.collection("users").document(userId).collection("coleccion")
+                .get()
+                .addOnSuccessListener(snapshots -> {
+                    coleccion.clear();
+                    for (QueryDocumentSnapshot doc : snapshots) {
+                        String nombre = doc.getString("nombre");
+                        String juego = doc.getString("juego");
+                        Carta carta = buscarEnCatalogo(nombre, juego);
+                        if (carta != null) {
+                            coleccion.add(carta);
+                        }
+                    }
+                });
+    }
+
+    private void guardarCartaEnFirestore(Carta carta) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("nombre", carta.getNombre());
+        data.put("juego", carta.getJuego());
+        db.collection("users").document(userId).collection("coleccion").add(data);
+    }
+
+    private Carta buscarEnCatalogo(String nombre, String juego) {
+        for (Carta c : catalogo) {
+            if (c.getNombre().equals(nombre) && c.getJuego().equals(juego)) {
+                return c;
+            }
+        }
+        return null;
     }
 
     private int dpToPx(int dp) {
