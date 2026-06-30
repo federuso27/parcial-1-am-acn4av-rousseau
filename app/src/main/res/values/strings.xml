@@ -39,4 +39,17 @@
     <string name="perfil_total_cartas">Total de cartas</string>
     <string name="perfil_juegos">Juegos distintos</string>
     <string name="perfil_carta_valiosa">Carta más valiosa</string>
+    <string name="perfil_cerrar_sesion">Cerrar sesión</string>
+
+    <!-- Login -->
+    <string name="login_hint_email">Correo electrónico</string>
+    <string name="login_hint_password">Contraseña</string>
+    <string name="login_btn_ingresar">Iniciar sesión</string>
+    <string name="login_btn_registrarse">Registrarse</string>
+    <string name="login_toggle_registro">¿No tenés cuenta? Registrate</string>
+    <string name="login_toggle_login">¿Ya tenés cuenta? Iniciá sesión</string>
+    <string name="login_error_campos">Completá todos los campos</string>
+    <string name="login_error_credenciales">Credenciales incorrectas. Verificá tu correo y contraseña.</string>
+    <string name="login_error_registro">No se pudo crear la cuenta. Intentá con otro correo.</string>
+    <string name="login_cargando">Cargando…</string>
 </resources>

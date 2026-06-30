@@ -103,6 +103,7 @@
             android:layout_marginStart="@dimen/margen_medio">
 
             <TextView
+                android:id="@+id/tvNombreUsuario"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/perfil_usuario"
@@ -111,6 +112,7 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tvEmailUsuario"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/perfil_proximamente_login"
@@ -282,5 +284,17 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btnCerrarSesion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/perfil_cerrar_sesion"
+        android:textColor="#EF5350"
+        android:backgroundTint="@android:color/transparent"
+        android:layout_marginTop="@dimen/margen_grande"
+        app:layout_constraintTop_toBottomOf="@id/layoutStats"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

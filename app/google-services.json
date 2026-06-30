@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "156695008701",
+    "project_id": "cardfolio-2af9c",
+    "storage_bucket": "cardfolio-2af9c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:156695008701:android:c5ba065b327ec42c7feed4",
+        "android_client_info": {
+          "package_name": "com.example.cardfolio"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlGkWyP-_AeRqMXq0M9qQwrWaX-2SQgzc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

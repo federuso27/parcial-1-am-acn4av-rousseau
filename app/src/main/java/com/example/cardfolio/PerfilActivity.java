@@ -1,6 +1,8 @@
 package com.example.cardfolio;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -8,6 +10,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -35,7 +40,23 @@ public class PerfilActivity extends AppCompatActivity {
 
         findViewById(R.id.btnVolver).setOnClickListener(v -> finish());
 
+        FirebaseUser usuario = FirebaseAuth.getInstance().getCurrentUser();
+        if (usuario != null) {
+            TextView tvEmail = findViewById(R.id.tvEmailUsuario);
+            tvEmail.setText(usuario.getEmail());
+        }
+
+        Button btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
+        btnCerrarSesion.setOnClickListener(v -> cerrarSesion());
+
         calcularYMostrarStats(coleccion);
+    }
+
+    private void cerrarSesion() {
+        FirebaseAuth.getInstance().signOut();
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 
     private void calcularYMostrarStats(ArrayList<Carta> coleccion) {
