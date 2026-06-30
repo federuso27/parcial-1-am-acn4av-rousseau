@@ -1,30 +1,18 @@
 package com.example.cardfolio;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Handler;
-import android.view.Gravity;
-import android.view.View;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.ScaleAnimation;
-import android.view.animation.Animation;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
-
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -35,22 +23,19 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    private EditText etBuscar;
-    private LinearLayout contenedorResultados;
-    private LinearLayout contenedorJuegos;
-    private Button btnQuitarFiltro = null;
-    private String juegoSeleccionado = null;
-    private TextView bannerExito;
-    private final Handler bannerHandler = new Handler();
-    private Runnable bannerOcultarRunnable;
-
     private FirebaseFirestore db;
     private String userId;
 
     private final List<Carta> catalogo = new ArrayList<>();
     private final List<Carta> coleccion = new ArrayList<>();
-    private List<Juego> juegos = new ArrayList<>();
-    private List<LinearLayout> itemsJuego = new ArrayList<>();
+
+    private ImageView navBuscarIcon, navPortfolioIcon, navPerfilIcon;
+    private TextView navBuscarText, navPortfolioText, navPerfilText;
+
+    private BuscarFragment buscarFragment;
+    private PortfolioFragment portfolioFragment;
+    private PerfilFragment perfilFragment;
+    private Fragment fragmentActivo;
 
     @Override
     protected void onStart() {
@@ -73,35 +58,58 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        etBuscar = findViewById(R.id.etBuscar);
-        contenedorResultados = findViewById(R.id.contenedorResultados);
-        contenedorJuegos = findViewById(R.id.contenedorJuegos);
-        bannerExito = findViewById(R.id.bannerExito);
-        Button btnBuscar = findViewById(R.id.btnBuscar);
-
         db = FirebaseFirestore.getInstance();
         userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         inicializarCatalogo();
-        inicializarJuegos();
-        mostrarBienvenida();
         cargarColeccionDesdeFirestore();
 
-        btnBuscar.setOnClickListener(v -> {
-            String query = etBuscar.getText().toString().trim();
-            buscarCartas(query);
-        });
+        navBuscarIcon = findViewById(R.id.navBuscarIcon);
+        navPortfolioIcon = findViewById(R.id.navPortfolioIcon);
+        navPerfilIcon = findViewById(R.id.navPerfilIcon);
+        navBuscarText = findViewById(R.id.navBuscarText);
+        navPortfolioText = findViewById(R.id.navPortfolioText);
+        navPerfilText = findViewById(R.id.navPerfilText);
 
-        findViewById(R.id.navPortfolio).setOnClickListener(v -> {
-            Intent intent = new Intent(this, PortfolioActivity.class);
-            intent.putExtra(PortfolioActivity.EXTRA_COLECCION, new ArrayList<>(coleccion));
-            startActivity(intent);
-        });
-        findViewById(R.id.navPerfil).setOnClickListener(v -> {
-            Intent intent = new Intent(this, PerfilActivity.class);
-            intent.putExtra(PerfilActivity.EXTRA_COLECCION, new ArrayList<>(coleccion));
-            startActivity(intent);
-        });
+        buscarFragment = new BuscarFragment();
+        portfolioFragment = new PortfolioFragment();
+        perfilFragment = new PerfilFragment();
+
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragmentContainer, buscarFragment, "buscar")
+                .add(R.id.fragmentContainer, portfolioFragment, "portfolio")
+                .add(R.id.fragmentContainer, perfilFragment, "perfil")
+                .hide(portfolioFragment)
+                .hide(perfilFragment)
+                .commit();
+
+        fragmentActivo = buscarFragment;
+
+        findViewById(R.id.navBuscar).setOnClickListener(v -> switchFragment(buscarFragment, "buscar"));
+        findViewById(R.id.navPortfolio).setOnClickListener(v -> switchFragment(portfolioFragment, "portfolio"));
+        findViewById(R.id.navPerfil).setOnClickListener(v -> switchFragment(perfilFragment, "perfil"));
+    }
+
+    private void switchFragment(Fragment fragment, String tab) {
+        if (fragmentActivo == fragment) return;
+        getSupportFragmentManager().beginTransaction()
+                .hide(fragmentActivo)
+                .show(fragment)
+                .commit();
+        fragmentActivo = fragment;
+        actualizarNavBar(tab);
+    }
+
+    private void actualizarNavBar(String tab) {
+        int inactivo = getColor(R.color.color_texto_secundario);
+        int activo = getColor(R.color.color_acento);
+
+        navBuscarIcon.setColorFilter(tab.equals("buscar") ? activo : inactivo);
+        navBuscarText.setTextColor(tab.equals("buscar") ? activo : inactivo);
+        navPortfolioIcon.setColorFilter(tab.equals("portfolio") ? activo : inactivo);
+        navPortfolioText.setTextColor(tab.equals("portfolio") ? activo : inactivo);
+        navPerfilIcon.setColorFilter(tab.equals("perfil") ? activo : inactivo);
+        navPerfilText.setTextColor(tab.equals("perfil") ? activo : inactivo);
     }
 
     private void inicializarCatalogo() {
@@ -116,306 +124,14 @@ public class MainActivity extends AppCompatActivity {
         catalogo.add(new Carta("Blue-Eyes White Dragon", "Ultra rare", R.drawable.blueeyes_white_dragon_ur, 0.78, "Yu-Gi-Oh!"));
     }
 
-    private void inicializarJuegos() {
-        juegos.add(new Juego("Yu-Gi-Oh!", R.drawable.logo_yugioh));
-        juegos.add(new Juego("Pokémon", R.drawable.logo_pokemon));
-        juegos.add(new Juego("Magic", R.drawable.logo_magic));
-        juegos.add(new Juego("One Piece", R.drawable.logo_onepiece));
-        juegos.add(new Juego("Riftbound", R.drawable.logo_riftbound));
+    public List<Carta> getCatalogo() { return catalogo; }
+    public List<Carta> getColeccion() { return coleccion; }
 
-        for (Juego juego : juegos) {
-            LinearLayout item = crearItemJuego(juego);
-            itemsJuego.add(item);
-            contenedorJuegos.addView(item);
-        }
-    }
-
-    private LinearLayout crearItemJuego(Juego juego) {
-        LinearLayout item = new LinearLayout(this);
-        item.setOrientation(LinearLayout.HORIZONTAL);
-        item.setGravity(Gravity.CENTER_VERTICAL);
-        item.setBackground(AppCompatResources.getDrawable(this, R.drawable.fondo_carta));
-        item.setPadding(dpToPx(16), dpToPx(12), dpToPx(16), dpToPx(12));
-
-        LinearLayout.LayoutParams paramsItem = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        paramsItem.setMargins(0, 0, 0, dpToPx(10));
-        item.setLayoutParams(paramsItem);
-
-        ImageView logo = new ImageView(this);
-        LinearLayout.LayoutParams paramsLogo = new LinearLayout.LayoutParams(dpToPx(120), dpToPx(70));
-        logo.setLayoutParams(paramsLogo);
-        logo.setImageResource(juego.getLogoResId());
-        logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
-
-        TextView tvNombre = new TextView(this);
-        tvNombre.setText(juego.getNombre());
-        tvNombre.setTextColor(getColor(R.color.color_texto_primario));
-        tvNombre.setTextSize(16);
-        tvNombre.setTypeface(null, Typeface.BOLD);
-        LinearLayout.LayoutParams paramsNombre = new LinearLayout.LayoutParams(
-                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
-        );
-        paramsNombre.setMarginStart(dpToPx(16));
-        tvNombre.setLayoutParams(paramsNombre);
-
-        item.addView(logo);
-        item.addView(tvNombre);
-        item.setOnClickListener(v -> seleccionarJuego(juego, item));
-
-        return item;
-    }
-
-    private void seleccionarJuego(Juego juego, LinearLayout item) {
-        // Ocultar todos los items menos el seleccionado
-        for (LinearLayout itemJuego : itemsJuego) {
-            if (itemJuego != item) {
-                itemJuego.setVisibility(View.GONE);
-            }
-        }
-
-        // Resaltar el seleccionado
-        item.setBackground(AppCompatResources.getDrawable(this, R.drawable.fondo_juego_seleccionado));
-        juegoSeleccionado = juego.getNombre();
-
-        // Agregar botón "Quitar filtro" debajo del juego seleccionado
-        if (btnQuitarFiltro == null) {
-            btnQuitarFiltro = new Button(this);
-            btnQuitarFiltro.setText(getString(R.string.btn_quitar_filtro));
-            btnQuitarFiltro.setTextColor(getColor(R.color.color_acento));
-            btnQuitarFiltro.setBackgroundColor(android.graphics.Color.TRANSPARENT);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-            btnQuitarFiltro.setLayoutParams(params);
-            btnQuitarFiltro.setOnClickListener(v -> limpiarFiltro());
-            contenedorJuegos.addView(btnQuitarFiltro);
-        }
-
-        etBuscar.setText("");
-        mostrarCartasPorJuego(juego.getNombre());
-    }
-
-    private void limpiarFiltro() {
-        // Mostrar todos los items de juego
-        for (LinearLayout itemJuego : itemsJuego) {
-            itemJuego.setVisibility(View.VISIBLE);
-            itemJuego.setBackground(AppCompatResources.getDrawable(this, R.drawable.fondo_carta));
-        }
-
-        // Eliminar botón quitar filtro
-        if (btnQuitarFiltro != null) {
-            contenedorJuegos.removeView(btnQuitarFiltro);
-            btnQuitarFiltro = null;
-        }
-
-        juegoSeleccionado = null;
-        etBuscar.setText("");
-        mostrarBienvenida();
-    }
-
-    private void mostrarCartasPorJuego(String nombreJuego) {
-        contenedorResultados.removeAllViews();
-
-        if (!nombreJuego.equals("Yu-Gi-Oh!")) {
-            TextView tv = new TextView(this);
-            tv.setText(getString(R.string.juego_proximamente));
-            tv.setTextColor(getColor(R.color.color_texto_secundario));
-            tv.setTextSize(15);
-            tv.setGravity(Gravity.CENTER);
-            tv.setPadding(0, dpToPx(24), 0, 0);
-            tv.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
-            ));
-            contenedorResultados.addView(tv);
-            return;
-        }
-
-        for (Carta carta : catalogo) {
-            if (carta.getJuego().equals(nombreJuego)) {
-                contenedorResultados.addView(crearVistaCarta(carta));
-            }
-        }
-    }
-
-    private void mostrarBienvenida() {
-        contenedorResultados.removeAllViews();
-
-        TextView tv = new TextView(this);
-        tv.setText(getString(R.string.bienvenida_texto));
-        tv.setTextColor(getColor(R.color.color_texto_secundario));
-        tv.setTextSize(15);
-        tv.setGravity(Gravity.CENTER);
-        tv.setPadding(0, dpToPx(24), 0, 0);
-        tv.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
-        ));
-        contenedorResultados.addView(tv);
-    }
-
-    private void buscarCartas(String query) {
-        contenedorResultados.removeAllViews();
-
-        if (query.isEmpty()) {
-            if (juegoSeleccionado != null) {
-                mostrarCartasPorJuego(juegoSeleccionado);
-            } else {
-                mostrarBienvenida();
-            }
-            return;
-        }
-
-        boolean hayResultados = false;
-        for (Carta carta : catalogo) {
-            boolean coincideNombre = carta.getNombre().toLowerCase().contains(query.toLowerCase());
-            boolean coincideJuego = juegoSeleccionado == null || carta.getJuego().equals(juegoSeleccionado);
-
-            if (coincideNombre && coincideJuego) {
-                contenedorResultados.addView(crearVistaCarta(carta));
-                hayResultados = true;
-            }
-        }
-
-        if (!hayResultados) {
-            TextView tv = new TextView(this);
-            tv.setText(getString(R.string.sin_resultados));
-            tv.setTextColor(getColor(R.color.color_texto_secundario));
-            tv.setTextSize(14);
-            tv.setGravity(Gravity.CENTER);
-            tv.setPadding(0, dpToPx(24), 0, 0);
-            contenedorResultados.addView(tv);
-        }
-    }
-
-    private LinearLayout crearVistaCarta(Carta carta) {
-        LinearLayout contenedor = new LinearLayout(this);
-        contenedor.setOrientation(LinearLayout.HORIZONTAL);
-        contenedor.setBackground(AppCompatResources.getDrawable(this, R.drawable.fondo_carta));
-        contenedor.setPadding(dpToPx(12), dpToPx(12), dpToPx(12), dpToPx(12));
-
-        LinearLayout.LayoutParams paramsContenedor = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        paramsContenedor.setMargins(0, 0, 0, dpToPx(10));
-        contenedor.setLayoutParams(paramsContenedor);
-
-        ImageView imagen = new ImageView(this);
-        imagen.setLayoutParams(new LinearLayout.LayoutParams(dpToPx(60), dpToPx(84)));
-        imagen.setImageResource(carta.getImagenResId());
-        imagen.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        contenedor.addView(imagen);
-
-        LinearLayout info = new LinearLayout(this);
-        info.setOrientation(LinearLayout.VERTICAL);
-        info.setGravity(Gravity.CENTER_VERTICAL);
-        LinearLayout.LayoutParams paramsInfo = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
-        paramsInfo.setMarginStart(dpToPx(12));
-        info.setLayoutParams(paramsInfo);
-
-        TextView tvNombre = new TextView(this);
-        tvNombre.setText(carta.getNombre());
-        tvNombre.setTextColor(getColor(R.color.color_texto_primario));
-        tvNombre.setTextSize(14);
-        tvNombre.setTypeface(null, Typeface.BOLD);
-
-        TextView tvRareza = new TextView(this);
-        tvRareza.setText(carta.getRareza());
-        tvRareza.setTextColor(getColorPorRareza(carta.getRareza()));
-        tvRareza.setTextSize(12);
-        tvRareza.setTypeface(null, Typeface.ITALIC);
-
-        TextView tvValor = new TextView(this);
-        tvValor.setText("$ " + carta.getValor());
-        tvValor.setTextColor(getColor(R.color.color_texto_secundario));
-        tvValor.setTextSize(12);
-
-        info.addView(tvNombre);
-        info.addView(tvRareza);
-        info.addView(tvValor);
-        contenedor.addView(info);
-
-        Button btnAgregar = new Button(this);
-        btnAgregar.setText(getString(R.string.btn_agregar_carta));
-        btnAgregar.setTextColor(getColor(R.color.color_fondo));
-        btnAgregar.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.color_acento)));
-        LinearLayout.LayoutParams paramBtn = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        paramBtn.gravity = Gravity.CENTER_VERTICAL;
-        btnAgregar.setLayoutParams(paramBtn);
-
-        btnAgregar.setOnClickListener(v -> {
-            coleccion.add(carta);
-            guardarCartaEnFirestore(carta);
-
-            // 1. Animación de escala en el botón
-            ScaleAnimation escala = new ScaleAnimation(
-                    1f, 1.15f, 1f, 1.15f,
-                    Animation.RELATIVE_TO_SELF, 0.5f,
-                    Animation.RELATIVE_TO_SELF, 0.5f
-            );
-            escala.setDuration(120);
-            escala.setRepeatMode(Animation.REVERSE);
-            escala.setRepeatCount(1);
-            btnAgregar.startAnimation(escala);
-
-            // 2. Cambiar botón a verde
-            btnAgregar.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.color_exito_claro)));
-
-            // 3. Mostrar banner de éxito con fade-in
-            mostrarBannerExito(carta.getNombre());
-
-            // 4. Volver al color dorado después de 1.5 segundos
-            new Handler().postDelayed(() ->
-                    btnAgregar.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.color_acento))),
-                    1500
-            );
-        });
-
-        contenedor.addView(btnAgregar);
-        return contenedor;
-    }
-
-    private void mostrarBannerExito(String nombreCarta) {
-        // Cancelar ocultamiento pendiente si el banner ya estaba visible
-        if (bannerOcultarRunnable != null) {
-            bannerHandler.removeCallbacks(bannerOcultarRunnable);
-        }
-
-        bannerExito.setText("✓  \"" + nombreCarta + "\" " + getString(R.string.exito_agregada));
-        bannerExito.setVisibility(View.VISIBLE);
-        bannerExito.clearAnimation();
-
-        AlphaAnimation fadeIn = new AlphaAnimation(0f, 1f);
-        fadeIn.setDuration(300);
-        bannerExito.startAnimation(fadeIn);
-
-        bannerOcultarRunnable = () -> {
-            AlphaAnimation fadeOut = new AlphaAnimation(1f, 0f);
-            fadeOut.setDuration(400);
-            fadeOut.setAnimationListener(new Animation.AnimationListener() {
-                @Override public void onAnimationStart(Animation a) {}
-                @Override public void onAnimationRepeat(Animation a) {}
-                @Override public void onAnimationEnd(Animation a) {
-                    bannerExito.setVisibility(View.GONE);
-                }
-            });
-            bannerExito.startAnimation(fadeOut);
-        };
-
-        bannerHandler.postDelayed(bannerOcultarRunnable, 2000);
-    }
-
-    private int getColorPorRareza(String rareza) {
-        switch (rareza) {
-            case "Super Rare":  return getColor(R.color.color_rareza_super_rare);
-            case "Ultra Rare":  return getColor(R.color.color_rareza_ultra_rare);
-            case "Secret Rare": return getColor(R.color.color_rareza_secret_rare);
-            default:            return getColor(R.color.color_rareza_common);
-        }
+    public void guardarCartaEnFirestore(Carta carta) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("nombre", carta.getNombre());
+        data.put("juego", carta.getJuego());
+        db.collection("users").document(userId).collection("coleccion").add(data);
     }
 
     private void cargarColeccionDesdeFirestore() {
@@ -427,30 +143,15 @@ public class MainActivity extends AppCompatActivity {
                         String nombre = doc.getString("nombre");
                         String juego = doc.getString("juego");
                         Carta carta = buscarEnCatalogo(nombre, juego);
-                        if (carta != null) {
-                            coleccion.add(carta);
-                        }
+                        if (carta != null) coleccion.add(carta);
                     }
                 });
     }
 
-    private void guardarCartaEnFirestore(Carta carta) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("nombre", carta.getNombre());
-        data.put("juego", carta.getJuego());
-        db.collection("users").document(userId).collection("coleccion").add(data);
-    }
-
     private Carta buscarEnCatalogo(String nombre, String juego) {
         for (Carta c : catalogo) {
-            if (c.getNombre().equals(nombre) && c.getJuego().equals(juego)) {
-                return c;
-            }
+            if (c.getNombre().equals(nombre) && c.getJuego().equals(juego)) return c;
         }
         return null;
-    }
-
-    private int dpToPx(int dp) {
-        return Math.round(dp * getResources().getDisplayMetrics().density);
     }
 }
