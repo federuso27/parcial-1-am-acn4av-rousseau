@@ -1,5 +1,6 @@
 package com.example.cardfolio;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -14,7 +15,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private Runnable bannerOcultarRunnable;
 
     private final List<Carta> catalogo = new ArrayList<>();
+    private final List<Carta> coleccion = new ArrayList<>();
     private List<Juego> juegos = new ArrayList<>();
     private List<LinearLayout> itemsJuego = new ArrayList<>();
 
@@ -68,12 +69,16 @@ public class MainActivity extends AppCompatActivity {
             buscarCartas(query);
         });
 
-        findViewById(R.id.navPortfolio).setOnClickListener(v ->
-                Toast.makeText(this, "Portfolio — próximamente", Toast.LENGTH_SHORT).show()
-        );
-        findViewById(R.id.navPerfil).setOnClickListener(v ->
-                Toast.makeText(this, "Perfil — próximamente", Toast.LENGTH_SHORT).show()
-        );
+        findViewById(R.id.navPortfolio).setOnClickListener(v -> {
+            Intent intent = new Intent(this, PortfolioActivity.class);
+            intent.putExtra(PortfolioActivity.EXTRA_COLECCION, new ArrayList<>(coleccion));
+            startActivity(intent);
+        });
+        findViewById(R.id.navPerfil).setOnClickListener(v -> {
+            Intent intent = new Intent(this, PerfilActivity.class);
+            intent.putExtra(PerfilActivity.EXTRA_COLECCION, new ArrayList<>(coleccion));
+            startActivity(intent);
+        });
     }
 
     private void inicializarCatalogo() {
@@ -320,6 +325,8 @@ public class MainActivity extends AppCompatActivity {
         btnAgregar.setLayoutParams(paramBtn);
 
         btnAgregar.setOnClickListener(v -> {
+            coleccion.add(carta);
+
             // 1. Animación de escala en el botón
             ScaleAnimation escala = new ScaleAnimation(
                     1f, 1.15f, 1f, 1.15f,

@@ -22,4 +22,21 @@
     <string name="btn_quitar_filtro">✕ Quitar filtro</string>
     <string name="exito_agregada">✓ agregada a tu colección</string>
     <string name="label_juegos">Filtro rápido</string>
+
+    <!-- Portfolio -->
+    <string name="portfolio_titulo">Mi Portfolio</string>
+    <string name="portfolio_vacio">Tu colección está vacía.\nAgregá cartas desde el catálogo.</string>
+    <string name="portfolio_valor_total">Valor total de la colección</string>
+    <string name="portfolio_cartas_label">cartas en tu colección</string>
+    <string name="label_cartas_agregadas">Cartas agregadas</string>
+    <string name="btn_volver">← Volver</string>
+
+    <!-- Perfil -->
+    <string name="perfil_titulo">Mi Perfil</string>
+    <string name="perfil_usuario">Coleccionista</string>
+    <string name="perfil_proximamente_login">Inicio de sesión próximamente</string>
+    <string name="perfil_estadisticas">Estadísticas de colección</string>
+    <string name="perfil_total_cartas">Total de cartas</string>
+    <string name="perfil_juegos">Juegos distintos</string>
+    <string name="perfil_carta_valiosa">Carta más valiosa</string>
 </resources>
