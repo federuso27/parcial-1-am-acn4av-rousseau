@@ -20,6 +20,8 @@ import android.widget.TextView;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -220,8 +222,12 @@ public class BuscarFragment extends Fragment {
 
         ImageView imagen = new ImageView(requireContext());
         imagen.setLayoutParams(new LinearLayout.LayoutParams(dp(60), dp(84)));
-        imagen.setImageResource(carta.getImagenResId());
         imagen.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        Glide.with(requireContext())
+                .load(carta.getImageUrl())
+                .placeholder(carta.getImagenResId())
+                .error(carta.getImagenResId())
+                .into(imagen);
         contenedor.addView(imagen);
 
         LinearLayout info = new LinearLayout(requireContext());
