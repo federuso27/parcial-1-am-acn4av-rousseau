@@ -54,8 +54,8 @@
         android:id="@+id/layoutUsuario"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
         android:background="@drawable/fondo_carta"
         android:padding="@dimen/margen_medio"
         android:layout_marginStart="@dimen/margen_medio"
@@ -73,32 +73,34 @@
             android:background="@drawable/fondo_avatar"
             android:padding="16dp" />
 
-        <LinearLayout
-            android:layout_width="0dp"
+        <Button
+            android:id="@+id/btnEditarPerfil"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="@string/editar_perfil_btn_editar"
+            android:textColor="@color/color_acento"
+            android:backgroundTint="@android:color/transparent"
+            android:textSize="12sp"
+            android:layout_marginTop="4dp" />
+
+        <TextView
+            android:id="@+id/tvNombreUsuario"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginStart="@dimen/margen_medio">
+            android:text="@string/perfil_usuario"
+            android:textColor="@color/color_texto_primario"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="4dp" />
 
-            <TextView
-                android:id="@+id/tvNombreUsuario"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/perfil_usuario"
-                android:textColor="@color/color_texto_primario"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tvEmailUsuario"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/perfil_proximamente_login"
-                android:textColor="@color/color_texto_secundario"
-                android:textSize="12sp"
-                android:layout_marginTop="2dp" />
-
-        </LinearLayout>
+        <TextView
+            android:id="@+id/tvEmailUsuario"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/perfil_proximamente_login"
+            android:textColor="@color/color_texto_secundario"
+            android:textSize="12sp"
+            android:layout_marginTop="2dp" />
 
     </LinearLayout>
 
@@ -118,7 +120,7 @@
         android:id="@+id/layoutStats"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_marginStart="@dimen/margen_medio"
         android:layout_marginEnd="@dimen/margen_medio"
         android:layout_marginTop="@dimen/margen_pequeño"
@@ -127,129 +129,87 @@
         app:layout_constraintTop_toBottomOf="@id/tvLabelEstadisticas">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="@dimen/margen_pequeño">
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:background="@drawable/fondo_carta"
+            android:padding="@dimen/margen_medio"
+            android:layout_marginEnd="@dimen/margen_pequeño">
 
-            <LinearLayout
-                android:layout_width="0dp"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:background="@drawable/fondo_carta"
-                android:padding="@dimen/margen_medio"
-                android:layout_marginEnd="@dimen/margen_pequeño">
+                android:text="@string/perfil_total_cartas"
+                android:textColor="@color/color_texto_secundario"
+                android:textSize="12sp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/perfil_total_cartas"
-                    android:textColor="@color/color_texto_secundario"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/tvStatCartas"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textColor="@color/color_acento"
-                    android:textSize="28sp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="2dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
+            <TextView
+                android:id="@+id/tvStatCartas"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:background="@drawable/fondo_carta"
-                android:padding="@dimen/margen_medio"
-                android:layout_marginStart="@dimen/margen_pequeño">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/portfolio_valor_total"
-                    android:textColor="@color/color_texto_secundario"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/tvStatValor"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="$ 0.00"
-                    android:textColor="@color/color_acento"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="2dp" />
-
-            </LinearLayout>
+                android:text="0"
+                android:textColor="@color/color_acento"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:layout_marginTop="2dp" />
 
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:background="@drawable/fondo_carta"
+            android:padding="@dimen/margen_medio"
+            android:layout_marginStart="@dimen/margen_pequeño"
+            android:layout_marginEnd="@dimen/margen_pequeño">
 
-            <LinearLayout
-                android:layout_width="0dp"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:background="@drawable/fondo_carta"
-                android:padding="@dimen/margen_medio"
-                android:layout_marginEnd="@dimen/margen_pequeño">
+                android:text="@string/portfolio_valor_total"
+                android:textColor="@color/color_texto_secundario"
+                android:textSize="12sp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/perfil_juegos"
-                    android:textColor="@color/color_texto_secundario"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/tvStatJuegos"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textColor="@color/color_acento"
-                    android:textSize="28sp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="2dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
+            <TextView
+                android:id="@+id/tvStatValor"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:background="@drawable/fondo_carta"
-                android:padding="@dimen/margen_medio"
-                android:layout_marginStart="@dimen/margen_pequeño">
+                android:text="$ 0.00"
+                android:textColor="@color/color_acento"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginTop="2dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/perfil_carta_valiosa"
-                    android:textColor="@color/color_texto_secundario"
-                    android:textSize="12sp" />
+        </LinearLayout>
 
-                <TextView
-                    android:id="@+id/tvStatMasValiosa"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="—"
-                    android:textColor="@color/color_acento"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="2dp" />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:background="@drawable/fondo_carta"
+            android:padding="@dimen/margen_medio"
+            android:layout_marginStart="@dimen/margen_pequeño">
 
-            </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/perfil_juegos"
+                android:textColor="@color/color_texto_secundario"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tvStatJuegos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textColor="@color/color_acento"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:layout_marginTop="2dp" />
 
         </LinearLayout>
 

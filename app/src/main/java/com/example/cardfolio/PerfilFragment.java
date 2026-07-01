@@ -1,13 +1,17 @@
 package com.example.cardfolio;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -20,7 +24,21 @@ import java.util.Set;
 
 public class PerfilFragment extends Fragment {
 
-    private TextView tvEmailUsuario, tvStatCartas, tvStatValor, tvStatJuegos, tvStatMasValiosa;
+    private TextView tvNombreUsuario, tvEmailUsuario, tvStatCartas, tvStatValor, tvStatJuegos;
+    private ActivityResultLauncher<Intent> editarPerfilLauncher;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        editarPerfilLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        cargarNombreUsuario();
+                    }
+                }
+        );
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -31,14 +49,22 @@ public class PerfilFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        tvEmailUsuario = view.findViewById(R.id.tvEmailUsuario);
-        tvStatCartas = view.findViewById(R.id.tvStatCartas);
-        tvStatValor = view.findViewById(R.id.tvStatValor);
-        tvStatJuegos = view.findViewById(R.id.tvStatJuegos);
-        tvStatMasValiosa = view.findViewById(R.id.tvStatMasValiosa);
+        tvNombreUsuario = view.findViewById(R.id.tvNombreUsuario);
+        tvEmailUsuario  = view.findViewById(R.id.tvEmailUsuario);
+        tvStatCartas    = view.findViewById(R.id.tvStatCartas);
+        tvStatValor     = view.findViewById(R.id.tvStatValor);
+        tvStatJuegos    = view.findViewById(R.id.tvStatJuegos);
 
         FirebaseUser usuario = FirebaseAuth.getInstance().getCurrentUser();
         if (usuario != null) tvEmailUsuario.setText(usuario.getEmail());
+
+        cargarNombreUsuario();
+
+        view.findViewById(R.id.btnEditarPerfil).setOnClickListener(v -> {
+            Intent intent = new Intent(requireActivity(), EditarPerfilActivity.class);
+            intent.putExtra("nombre_actual", tvNombreUsuario.getText().toString());
+            editarPerfilLauncher.launch(intent);
+        });
 
         view.findViewById(R.id.btnCerrarSesion).setOnClickListener(v -> cerrarSesion());
 
@@ -51,6 +77,13 @@ public class PerfilFragment extends Fragment {
         if (!hidden) actualizarStats();
     }
 
+    private void cargarNombreUsuario() {
+        if (tvNombreUsuario == null) return;
+        FirebaseUser usuario = FirebaseAuth.getInstance().getCurrentUser();
+        String nombre = (usuario != null) ? usuario.getDisplayName() : null;
+        tvNombreUsuario.setText(!TextUtils.isEmpty(nombre) ? nombre : getString(R.string.perfil_usuario));
+    }
+
     private void actualizarStats() {
         if (tvStatCartas == null) return;
 
@@ -58,20 +91,15 @@ public class PerfilFragment extends Fragment {
 
         double totalValor = 0;
         Set<String> juegosDistintos = new HashSet<>();
-        Carta cartaMasValiosa = null;
 
         for (Carta c : coleccion) {
             totalValor += c.getValor();
             juegosDistintos.add(c.getJuego());
-            if (cartaMasValiosa == null || c.getValor() > cartaMasValiosa.getValor()) {
-                cartaMasValiosa = c;
-            }
         }
 
         tvStatCartas.setText(String.valueOf(coleccion.size()));
         tvStatValor.setText(String.format(Locale.getDefault(), "$ %.2f", totalValor));
         tvStatJuegos.setText(String.valueOf(juegosDistintos.size()));
-        tvStatMasValiosa.setText(cartaMasValiosa != null ? cartaMasValiosa.getNombre() : "—");
     }
 
     private void cerrarSesion() {

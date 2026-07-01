@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_fondo">
+
+    <LinearLayout
+        android:id="@+id/layoutHeader"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/margen_medio"
+        android:paddingEnd="@dimen/margen_medio"
+        android:paddingTop="@dimen/margen_grande"
+        android:paddingBottom="@dimen/margen_pequeño"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/btnVolver"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_volver"
+            android:background="@android:color/transparent"
+            android:tint="@color/color_texto_secundario"
+            android:contentDescription="Volver" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/editar_perfil_titulo"
+            android:textColor="@color/color_acento"
+            android:textSize="@dimen/texto_titulo"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            android:layout_marginStart="@dimen/margen_pequeño" />
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/color_borde"
+        android:layout_marginStart="@dimen/margen_medio"
+        android:layout_marginEnd="@dimen/margen_medio"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutHeader" />
+
+    <LinearLayout
+        android:id="@+id/layoutContenido"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:paddingStart="@dimen/margen_grande"
+        android:paddingEnd="@dimen/margen_grande"
+        android:layout_marginTop="@dimen/margen_grande"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/divider">
+
+        <ImageView
+            android:layout_width="88dp"
+            android:layout_height="88dp"
+            android:src="@drawable/ic_perfil"
+            android:tint="@color/color_acento"
+            android:background="@drawable/fondo_avatar"
+            android:padding="20dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/editar_perfil_hint_nombre"
+            android:textColor="@color/color_texto_secundario"
+            android:textSize="12sp"
+            android:layout_marginTop="32dp"
+            android:layout_gravity="start" />
+
+        <EditText
+            android:id="@+id/etNombreUsuario"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@android:color/transparent"
+            android:textColor="@color/color_texto_primario"
+            android:textColorHint="@color/color_texto_secundario"
+            android:textSize="18sp"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:paddingBottom="8dp"
+            android:imeOptions="actionDone"
+            android:singleLine="true"
+            android:inputType="textPersonName" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#80E2B96F"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/tvErrorNombre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#EF5350"
+            android:textSize="13sp"
+            android:layout_marginTop="4dp"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btnGuardar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/alto_boton"
+            android:text="@string/editar_perfil_guardar"
+            android:textColor="@color/color_fondo"
+            android:backgroundTint="@color/color_acento"
+            android:textStyle="bold"
+            android:layout_marginTop="@dimen/margen_grande" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

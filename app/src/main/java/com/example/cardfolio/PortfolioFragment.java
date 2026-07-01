@@ -198,10 +198,20 @@ public class PortfolioFragment extends Fragment {
 
     private int getColorPorRareza(String rareza) {
         switch (rareza) {
-            case "Super Rare":  return requireContext().getColor(R.color.color_rareza_super_rare);
-            case "Ultra Rare":  return requireContext().getColor(R.color.color_rareza_ultra_rare);
-            case "Secret Rare": return requireContext().getColor(R.color.color_rareza_secret_rare);
-            default:            return requireContext().getColor(R.color.color_rareza_common);
+            case "Rare":
+            case "Double Rare":
+            case "Super Rare":
+                return requireContext().getColor(R.color.color_rareza_super_rare);
+            case "Ultra Rare":
+            case "Illustration Rare":
+                return requireContext().getColor(R.color.color_rareza_ultra_rare);
+            case "Secret Rare":
+            case "Starlight Rare":
+            case "Special Illustration Rare":
+            case "Hyper Rare":
+                return requireContext().getColor(R.color.color_rareza_secret_rare);
+            default:
+                return requireContext().getColor(R.color.color_rareza_common);
         }
     }
 
