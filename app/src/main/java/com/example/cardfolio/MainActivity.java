@@ -223,6 +223,29 @@ public class MainActivity extends AppCompatActivity {
     public List<Carta> getCatalogo() { return catalogo; }
     public List<Carta> getColeccion() { return coleccion; }
 
+    public void eliminarCartaDeFirestore(Carta carta) {
+        db.collection("users").document(userId).collection("coleccion")
+                .whereEqualTo("nombre", carta.getNombre())
+                .whereEqualTo("juego", carta.getJuego())
+                .limit(1)
+                .get()
+                .addOnSuccessListener(snapshots -> {
+                    for (QueryDocumentSnapshot doc : snapshots) {
+                        doc.getReference().delete();
+                    }
+                });
+    }
+
+    public void limpiarColeccionEnFirestore() {
+        db.collection("users").document(userId).collection("coleccion")
+                .get()
+                .addOnSuccessListener(snapshots -> {
+                    for (QueryDocumentSnapshot doc : snapshots) {
+                        doc.getReference().delete();
+                    }
+                });
+    }
+
     public void guardarCartaEnFirestore(Carta carta) {
         Map<String, Object> data = new HashMap<>();
         data.put("nombre", carta.getNombre());

@@ -1,11 +1,14 @@
 package com.example.cardfolio;
 
+import android.app.AlertDialog;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -34,8 +37,12 @@ public class PortfolioFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         tvValorTotal = view.findViewById(R.id.tvValorTotal);
-        tvCantidad = view.findViewById(R.id.tvCantidad);
-        contenedor = view.findViewById(R.id.contenedorPortfolio);
+        tvCantidad   = view.findViewById(R.id.tvCantidad);
+        contenedor   = view.findViewById(R.id.contenedorPortfolio);
+
+        Button btnLimpiar = view.findViewById(R.id.btnLimpiarPortfolio);
+        btnLimpiar.setOnClickListener(v -> confirmarLimpiar());
+
         mostrarPortfolio();
     }
 
@@ -45,14 +52,27 @@ public class PortfolioFragment extends Fragment {
         if (!hidden) mostrarPortfolio();
     }
 
+    private void confirmarLimpiar() {
+        new AlertDialog.Builder(requireContext())
+                .setTitle(getString(R.string.portfolio_confirmar_titulo))
+                .setMessage(getString(R.string.portfolio_confirmar_mensaje))
+                .setPositiveButton(getString(R.string.confirmar), (dialog, which) -> {
+                    getMain().getColeccion().clear();
+                    getMain().limpiarColeccionEnFirestore();
+                    mostrarPortfolio();
+                })
+                .setNegativeButton(getString(R.string.cancelar), null)
+                .show();
+    }
+
     private void mostrarPortfolio() {
         if (contenedor == null) return;
         contenedor.removeAllViews();
 
-        List<Carta> coleccion = ((MainActivity) requireActivity()).getColeccion();
+        List<Carta> coleccion = getMain().getColeccion();
 
         LinkedHashMap<String, Carta> cartasUnicas = new LinkedHashMap<>();
-        LinkedHashMap<String, Integer> cantidades = new LinkedHashMap<>();
+        LinkedHashMap<String, Integer> cantidades  = new LinkedHashMap<>();
         for (Carta c : coleccion) {
             String nombre = c.getNombre();
             if (!cartasUnicas.containsKey(nombre)) {
@@ -92,6 +112,7 @@ public class PortfolioFragment extends Fragment {
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setBackground(AppCompatResources.getDrawable(requireContext(), R.drawable.fondo_carta));
         row.setPadding(dp(12), dp(12), dp(12), dp(12));
+        row.setGravity(Gravity.CENTER_VERTICAL);
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -157,6 +178,21 @@ public class PortfolioFragment extends Fragment {
             row.addView(tvBadge);
         }
 
+        ImageButton btnEliminar = new ImageButton(requireContext());
+        btnEliminar.setImageDrawable(AppCompatResources.getDrawable(requireContext(), R.drawable.ic_delete));
+        btnEliminar.setBackground(AppCompatResources.getDrawable(requireContext(), android.R.drawable.btn_default));
+        btnEliminar.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+        LinearLayout.LayoutParams paramsBtn = new LinearLayout.LayoutParams(dp(36), dp(36));
+        paramsBtn.gravity = Gravity.CENTER_VERTICAL;
+        paramsBtn.setMarginStart(dp(8));
+        btnEliminar.setLayoutParams(paramsBtn);
+        btnEliminar.setOnClickListener(v -> {
+            getMain().getColeccion().remove(carta);
+            getMain().eliminarCartaDeFirestore(carta);
+            mostrarPortfolio();
+        });
+        row.addView(btnEliminar);
+
         return row;
     }
 
@@ -171,5 +207,9 @@ public class PortfolioFragment extends Fragment {
 
     private int dp(int dp) {
         return Math.round(dp * requireContext().getResources().getDisplayMetrics().density);
+    }
+
+    private MainActivity getMain() {
+        return (MainActivity) requireActivity();
     }
 }

@@ -25,6 +25,11 @@
 
     <!-- Portfolio -->
     <string name="portfolio_titulo">Mi Portfolio</string>
+    <string name="portfolio_btn_limpiar">Limpiar todo</string>
+    <string name="portfolio_confirmar_titulo">¿Vaciar portfolio?</string>
+    <string name="portfolio_confirmar_mensaje">Se eliminarán todas las cartas de tu colección. Esta acción no se puede deshacer.</string>
+    <string name="confirmar">Confirmar</string>
+    <string name="cancelar">Cancelar</string>
     <string name="portfolio_vacio">Tu colección está vacía.\nAgregá cartas desde el catálogo.</string>
     <string name="portfolio_valor_total">Valor total de la colección</string>
     <string name="portfolio_cartas_label">cartas en tu colección</string>
